@@ -33,7 +33,7 @@ tags:
 | **Team** | [InxCod](https://huggingface.co/InxCod) |
 | **Hosted MCP Server** | `https://folksy-productively-delaine.ngrok-free.dev/sse` |
 | **Demo Video** | [🎥 Watch on YouTube](https://youtu.be/FxCvfqcH0Vo) |
-| **Social Post** | [View on X/Twitter](#) |
+| **Social Post** | [View on X/Twitter](https://x.com/SuccessVsdworld/status/1995277010520936536) |
 
 ### Why These Categories?
 
