@@ -1,0 +1,33 @@
+# Blaxel Fleet Commander - MCP Server
+# For Claude Desktop integration
+
+# Blaxel SDK
+blaxel>=0.1.0
+
+# HTTP client
+httpx>=0.28.1
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# Qdrant vector database
+qdrant-client>=1.9.0
+
+# LlamaIndex RAG
+llama-index>=0.10.0
+llama-index-embeddings-mistralai>=0.1.0
+llama-index-vector-stores-qdrant>=0.2.0
+llama-index-llms-mistralai>=0.1.0
+
+# Weave tracing
+weave>=0.52.7
+
+# MCP (for tool definitions)
+fastmcp>=2.12.3
+mcp[cli]>=1.13.1
+
+# YAML config
+pyyaml>=6.0.2
+
+# Requests
+requests>=2.31.0

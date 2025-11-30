@@ -1,0 +1,37 @@
+globals:
+  workspace: "iic"
+  api_key_ref: "${BL_API_KEY}"
+  default_region: "us-pdx-1"
+
+templates:
+  prod-node:
+    image: "blaxel/prod-node:latest"
+    memory: 4096
+    ports:
+      - name: "game"
+        target: 8080
+        public: true
+    envs:
+      - name: "NODE_ENV"
+        value: "production"
+  
+  dev-fast:
+    image: "blaxel/prod-node:latest"
+    memory: 2048
+    ports:
+      - name: "game"
+        target: 8080
+        public: true
+
+rbac:
+  groups:
+    hackers:
+      allowed_templates: ["dev-fast", "prod-node"]
+      max_sandboxes: 10
+    gods:
+      allowed_templates: ["*"]
+      max_sandboxes: 50
+  
+  users:
+    - api_key: "gsk_hack_winner_2025"
+      groups: ["gods"]

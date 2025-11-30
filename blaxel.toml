@@ -1,0 +1,6 @@
+[metadata]
+name = "fleet-sandbox"
+type = "sandbox"
+
+[spec]
+dockerfile = "Dockerfile.sandbox"
