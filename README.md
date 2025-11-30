@@ -30,8 +30,7 @@ tags:
 | **Hackathon** | MCP's 1st Birthday - Hosted by Anthropic and Gradio |
 | **Track** | Track 1: Building MCP |
 | **Categories** | Enterprise, Creative |
-| **Team** | [InxCod](https://huggingface.co/InxCod) |
-| **Hosted MCP Server** | `https://folksy-productively-delaine.ngrok-free.dev/sse` |
+| **Team** | [InxCodm](https://huggingface.co/InxCodm) |
 | **Demo Video** | [🎥 Watch on YouTube](https://youtu.be/FxCvfqcH0Vo) |
 | **Social Post** | [View on X/Twitter](https://x.com/SuccessVsdworld/status/1995277010520936536) |
 
