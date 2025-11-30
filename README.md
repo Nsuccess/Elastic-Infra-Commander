@@ -31,7 +31,7 @@ tags:
 | **Track** | Track 1: Building MCP |
 | **Categories** | Enterprise, Creative |
 | **Team** | [InxCod](https://huggingface.co/InxCod) |
-| **Hosting** | MCP Server runs locally via Claude Desktop (STDIO transport) |
+| **Hosted MCP Server** | `https://folksy-productively-delaine.ngrok-free.dev/sse` |
 | **Demo Video** | [🎥 Watch on YouTube](https://youtu.be/FxCvfqcH0Vo) |
 | **Social Post** | [View on X/Twitter](#) |
 
