@@ -1,13 +1,11 @@
-# Blaxel Fleet Commander - MCP Server
-# For Claude Desktop integration
+# Elastic Infra Commander
+# For Elasticsearch Agent Builder Hackathon
 
 # Blaxel SDK
 blaxel>=0.1.0
 
 # HTTP client
 httpx>=0.28.1
-
-# Environment variables
 python-dotenv>=1.0.0
 
 # Qdrant vector database
