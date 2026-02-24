@@ -55,30 +55,28 @@ async def deploy_to_vm(repo_url: str, vm_number: int):
         # Install dependencies
         print(f"  VM {vm_number}: Installing dependencies...")
         await sandbox.process.exec({
-            "name": "npm-ci",
             "command": "cd /app && npm ci",
-            "wait_for_completion": False
+            "wait_for_completion": True,
+            "timeout": 180000
         })
-        await sandbox.process.wait("npm-ci", max_wait=180000)
         
         # Build application
         print(f"  VM {vm_number}: Building application...")
         await sandbox.process.exec({
-            "name": "npm-build",
             "command": "cd /app && npm run build",
-            "wait_for_completion": False
+            "wait_for_completion": True,
+            "timeout": 60000
         })
-        await sandbox.process.wait("npm-build", max_wait=60000)
         
-        # Start server
+        # Start server (non-blocking, runs in background)
         print(f"  VM {vm_number}: Starting server...")
         await sandbox.process.exec({
-            "name": "serve-app",
             "command": "cd /app && npx serve -s dist -l 3000",
             "wait_for_completion": False
         })
         
-        await asyncio.sleep(5)  # Wait for server to start
+        # Wait for port 3000 to be ready
+        await asyncio.sleep(5)
         
         # Create preview URL with token
         print(f"  VM {vm_number}: Creating preview URL...")
