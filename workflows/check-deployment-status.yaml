@@ -1,0 +1,41 @@
+name: Check Deployment Status
+description: Check status of deployment requests and retrieve live URLs
+enabled: true
+tags: ["blaxel", "status", "monitoring"]
+
+triggers:
+  - type: manual
+
+inputs:
+  - name: limit
+    type: number
+    default: 10
+    description: "Number of recent deployments to show"
+
+consts:
+  requestIndex: "distributed-tool-requests"
+  resultIndex: "distributed-tool-results"
+
+steps:
+  - name: get_recent_requests
+    type: elasticsearch.search
+    with:
+      index: "{{ consts.requestIndex }}"
+      body:
+        size: "{{ inputs.limit }}"
+        sort:
+          - created_at: desc
+
+  - name: get_results
+    type: elasticsearch.search
+    with:
+      index: "{{ consts.resultIndex }}"
+      body:
+        size: "{{ inputs.limit }}"
+        sort:
+          - completed_at: desc
+
+  - name: display_status
+    type: console
+    with:
+      message: "Recent Deployments - Requests: {{ steps.get_recent_requests.output.hits.total.value }}, Results: {{ steps.get_results.output.hits.total.value }}"

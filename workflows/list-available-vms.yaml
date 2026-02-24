@@ -1,0 +1,22 @@
+name: List Available VMs
+description: Query available Blaxel VMs and their status
+enabled: true
+tags: ["blaxel", "vms", "infrastructure"]
+
+triggers:
+  - type: manual
+
+steps:
+  - name: query_sandboxes
+    type: console
+    with:
+      message: "Querying available Blaxel VMs... (This would call Blaxel API via runner)"
+
+  - name: log_query
+    type: elasticsearch.index
+    with:
+      index: "sandbox-queries"
+      document:
+        query_type: "list_vms"
+        timestamp: "{{ now() }}"
+        requested_by: "agent-builder"

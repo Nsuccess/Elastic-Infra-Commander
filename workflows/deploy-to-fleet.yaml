@@ -1,0 +1,58 @@
+name: Deploy to Blaxel Fleet
+description: Deploy application to distributed Blaxel VMs with automatic setup
+enabled: true
+tags: ["blaxel", "deployment", "distributed"]
+
+triggers:
+  - type: manual
+
+inputs:
+  - name: repo_url
+    type: string
+    required: true
+    description: "Git repository URL to deploy"
+  - name: num_vms
+    type: number
+    default: 2
+    description: "Number of VMs to deploy to"
+  - name: port
+    type: number
+    default: 3000
+    description: "Application port"
+
+consts:
+  requestIndex: "distributed-tool-requests"
+  logIndex: "deployment-logs"
+
+steps:
+  - name: create_deployment_request
+    type: elasticsearch.index
+    with:
+      index: "{{ consts.requestIndex }}"
+      document:
+        tool_name: "fleet_deploy"
+        repo_url: "{{ inputs.repo_url }}"
+        num_vms: "{{ inputs.num_vms }}"
+        port: "{{ inputs.port }}"
+        build_command: "npm ci && npm run build"
+        start_command: "npx serve -s dist -l 3000"
+        status: "pending"
+        created_at: "{{ now() }}"
+        requested_by: "agent-builder"
+
+  - name: log_deployment_start
+    type: elasticsearch.index
+    with:
+      index: "{{ consts.logIndex }}"
+      document:
+        request_id: "{{ steps.create_deployment_request.output._id }}"
+        event_type: "DEPLOYMENT_REQUESTED"
+        timestamp: "{{ now() }}"
+        repo_url: "{{ inputs.repo_url }}"
+        num_vms: "{{ inputs.num_vms }}"
+        message: "Deployment request created, waiting for runner"
+
+  - name: confirmation
+    type: console
+    with:
+      message: "Deployment request created with ID {{ steps.create_deployment_request.output._id }}. Repository: {{ inputs.repo_url }}. Target VMs: {{ inputs.num_vms }}. Status: Waiting for distributed runner to execute."
