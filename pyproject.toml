@@ -1,7 +1,7 @@
 [project]
-name = "BLAXEL_FLEET_MCP"
+name = "ELASTIC_INFRA_COMMANDER"
 version = "0.1.0"
-description = "Blaxel Fleet Commander - MCP server for parallel game deployment across Blaxel sandboxes."
+description = "Elastic Infra Commander - Elasticsearch-powered agent for parallel deployment to distributed VMs."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
