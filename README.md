@@ -296,34 +296,119 @@ The system uses these Elasticsearch indices:
 
 ## How It Works
 
-### 1. Agent Understands Intent
+### Complete Workflow
 
-The agent parses your natural language request and determines:
-- Repository URL
-- Number of VMs needed
-- Deployment steps required
+**1. User Interaction (Kibana)**
 
-### 2. Parallel Execution
+In Kibana's Agent Builder, you create an agent and give it a natural language prompt:
 
-Deploys to multiple VMs simultaneously using Blaxel sandboxes:
-- Provision VMs
-- Clone repository
-- Install dependencies
-- Build application
-- Start servers
+```
+Deploy https://github.com/Nsuccess/mcp-leap.git to 2 VMs
+```
 
-### 3. Elasticsearch Logging
+**2. Workflow Execution (Elasticsearch)**
 
-Every action is logged to Elasticsearch:
-- Deployment start/end
-- Command execution
-- Build output
-- Errors and failures
-- Performance metrics
+The agent triggers the `deploy-to-fleet.yaml` workflow which:
+- Creates a document in `distributed-tool-requests` index
+- Sets status to `pending`
+- Logs the request in `deployment-logs` index
+- Returns confirmation with request ID
 
-### 4. Live URLs
+**3. Runner Picks Up Request (Python)**
 
-Returns secure preview URLs with 24-hour tokens, ready to share.
+The distributed runner (`runner/distributed_runner.py`):
+- Polls `distributed-tool-requests` index every 2 seconds
+- Finds pending requests
+- Updates status to `processing`
+- Executes deployment in parallel
+
+**4. Parallel Deployment (Blaxel)**
+
+For each VM, the runner:
+- Creates a Blaxel sandbox (Node.js environment, 4GB RAM)
+- Clones the Git repository
+- Installs dependencies (`npm ci`)
+- Builds the application (`npm run build`)
+- Starts the server on port 3000
+- Creates a preview URL with 24-hour token
+- Returns the live URL
+
+**5. Results Storage (Elasticsearch)**
+
+The runner:
+- Stores results in `distributed-tool-results` index
+- Updates request status to `completed`
+- Logs deployment events
+- Displays live URLs in console
+
+**6. Access Applications**
+
+Click the URLs to access your deployed applications:
+```
+https://xxx.preview.bl.run?bl_preview_token=yyy
+```
+
+### Elasticsearch Workflow Files
+
+**workflows/deploy-to-fleet.yaml**
+
+Main deployment workflow that creates deployment requests:
+
+```yaml
+name: Deploy to Blaxel Fleet
+description: Deploy application to distributed Blaxel VMs
+
+inputs:
+  - name: repo_url
+    type: string
+    required: true
+  - name: num_vms
+    type: number
+    default: 2
+
+steps:
+  - name: create_deployment_request
+    type: elasticsearch.index
+    with:
+      index: "distributed-tool-requests"
+      document:
+        repo_url: "{{ inputs.repo_url }}"
+        num_vms: "{{ inputs.num_vms }}"
+        status: "pending"
+```
+
+**workflows/check-deployment-status.yaml**
+
+Query deployment status and retrieve results:
+
+```yaml
+name: Check Deployment Status
+description: Check status of recent deployments
+
+steps:
+  - name: get_recent_requests
+    type: elasticsearch.search
+    with:
+      index: "distributed-tool-requests"
+      body:
+        size: 10
+        sort: [{ created_at: desc }]
+```
+
+**workflows/list-available-vms.yaml**
+
+List available Blaxel VMs (for monitoring):
+
+```yaml
+name: List Available VMs
+description: Query available Blaxel VMs
+
+steps:
+  - name: query_sandboxes
+    type: console
+    with:
+      message: "Querying Blaxel VMs..."
+```
 
 ---
 
