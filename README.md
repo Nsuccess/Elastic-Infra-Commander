@@ -1,25 +1,6 @@
 # 🚀 Elastic Infra Commander
 
 > **Turn Elasticsearch into a true DevOps co-pilot.** Deploy applications to distributed VMs from a simple prompt—no manual config needed. Built for infrastructure engineers and developers who hate DevOps. Executes in parallel, keeps everything observable through Elasticsearch. From prompt to production in 55 seconds.
-
-[![Hackathon](https://img.shields.io/badge/Hackathon-Elasticsearch%20Agent%20Builder-blueviolet)]()
-[![Prize](https://img.shields.io/badge/Prize-$20,000-green)]()
-[![Deadline](https://img.shields.io/badge/Deadline-Feb%2027%202026-red)]()
-[![Elasticsearch](https://img.shields.io/badge/Powered%20by-Elasticsearch-005571)]()
-
----
-
-## 📋 Hackathon Submission
-
-| Field | Details |
-|-------|---------|
-| **Hackathon** | Elasticsearch Agent Builder Hackathon |
-| **Prize** | $20,000 |
-| **Deadline** | February 27, 2026 at 1:15 PM ET |
-| **Team** | [Nsuccess](https://github.com/Nsuccess) |
-| **Demo Video** | [🎥 Watch on YouTube](https://youtu.be/FxCvfqcH0Vo) |
-| **Social Post** | [View on X/Twitter](https://x.com/SuccessVsdworld/status/1995277010520936536) |
-
 ---
 
 ## What is Elastic Infra Commander?
