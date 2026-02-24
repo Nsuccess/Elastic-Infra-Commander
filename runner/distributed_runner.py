@@ -154,7 +154,7 @@ async def process_deployment_request(request):
     
     total_time = (datetime.now(timezone.utc) - start_time).total_seconds()
     
-    # Store results
+    # Store results (use request_id as document ID for easy retrieval)
     result_doc = {
         "request_id": request_id,
         "repo_url": repo_url,
@@ -165,7 +165,7 @@ async def process_deployment_request(request):
         "status": "completed"
     }
     
-    es.index(index="distributed-tool-results", document=result_doc)
+    es.index(index="distributed-tool-results", id=request_id, document=result_doc)
     
     # Update request status
     es.update(
