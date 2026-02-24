@@ -107,12 +107,92 @@ BL_WORKSPACE=your-workspace
 
 ### 3. Run
 
+**Step 1: Start the Distributed Runner**
+
+The runner polls Elasticsearch for deployment requests and executes them on Blaxel VMs:
+
 ```bash
-python agent/main.py
+py runner/distributed_runner.py
 ```
 
-Then ask:
-> "Deploy https://github.com/user/my-app.git to 2 VMs"
+You should see:
+```
+======================================================================
+🚀 Elastic Infra Commander - Distributed Runner
+======================================================================
+Elasticsearch: https://your-cluster.es.cloud:443
+Blaxel Workspace: your-workspace
+
+⏳ Polling for deployment requests...
+   (Press Ctrl+C to stop)
+```
+
+**Step 2: Create Deployment Request in Kibana**
+
+1. Open **Kibana** → **Management** → **Dev Tools** or **Agent Builder**
+2. Use the Elasticsearch Agent Builder to create an agent
+3. In the agent chat, run:
+
+```
+Deploy https://github.com/user/my-app.git to 2 VMs
+```
+
+**What Happens:**
+
+1. The agent uses the `deploy-to-fleet` workflow
+2. Workflow creates a deployment request in Elasticsearch index `distributed-tool-requests`
+3. The runner (polling every 2 seconds) picks up the request
+4. Runner deploys to 2 VMs in parallel:
+   - Creates Blaxel sandboxes
+   - Clones repository
+   - Installs dependencies (`npm ci`)
+   - Builds application (`npm run build`)
+   - Starts server on port 3000
+   - Creates preview URLs with 24-hour tokens
+5. Results stored in `distributed-tool-results` index
+6. Runner displays live URLs
+
+**Expected Output (from runner):**
+
+```
+======================================================================
+📦 Processing Deployment Request: abc123
+======================================================================
+Repository: https://github.com/user/my-app.git
+Target VMs: 2
+
+🚀 Deploying to 2 VMs in parallel...
+  VM 1: Creating sandbox...
+  VM 1: ✅ Sandbox created: elastic-deploy-a1b2c3d4
+  VM 1: Cloning repository...
+  VM 1: Installing dependencies...
+  VM 1: Building application...
+  VM 1: Starting server...
+  VM 1: Creating preview URL...
+  VM 1: ✅ DEPLOYED in 52.3s
+  VM 1: 🌐 https://xxx.preview.bl.run?bl_preview_token=yyy
+
+  VM 2: Creating sandbox...
+  VM 2: ✅ Sandbox created: elastic-deploy-e5f6g7h8
+  VM 2: Cloning repository...
+  VM 2: Installing dependencies...
+  VM 2: Building application...
+  VM 2: Starting server...
+  VM 2: Creating preview URL...
+  VM 2: ✅ DEPLOYED in 54.1s
+  VM 2: 🌐 https://zzz.preview.bl.run?bl_preview_token=www
+
+======================================================================
+✅ Deployment Complete!
+======================================================================
+Total Time: 54.1s
+Successful: 2/2
+
+Live URLs:
+  • VM 1: https://xxx.preview.bl.run?bl_preview_token=yyy
+  • VM 2: https://zzz.preview.bl.run?bl_preview_token=www
+======================================================================
+```
 
 ---
 
@@ -120,20 +200,32 @@ Then ask:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                  Natural Language Input                     │
-│         "Deploy this app to 2 VMs in parallel"              │
+│                    Kibana Agent Builder                     │
+│         User: "Deploy this app to 2 VMs"                    │
 └─────────────────────┬───────────────────────────────────────┘
                       │
                       ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              Elastic Infra Commander Agent                  │
-│                   (agent/main.py)                           │
+│              Elasticsearch Workflow Engine                  │
+│           (workflows/deploy-to-fleet.yaml)                  │
 │                                                             │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
-│  │  Deployment  │  │ Elasticsearch│  │   Blaxel     │     │
-│  │   Runner     │  │   Logger     │  │   SDK        │     │
-│  │ (runner/)    │  │ (workflows/) │  │ (src/blaxel/)│     │
-│  └──────────────┘  └──────────────┘  └──────────────┘     │
+│  Creates deployment request in ES index:                    │
+│  distributed-tool-requests                                  │
+└─────────────────────┬───────────────────────────────────────┘
+                      │
+                      ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    Elasticsearch                            │
+│         Index: distributed-tool-requests                    │
+│         Status: pending → processing → completed            │
+└─────────────────────┬───────────────────────────────────────┘
+                      │ (polls every 2s)
+                      ▼
+┌─────────────────────────────────────────────────────────────┐
+│              Distributed Runner (Python)                    │
+│           (runner/distributed_runner.py)                    │
+│                                                             │
+│  Polls ES → Picks up request → Deploys in parallel         │
 └─────────────────────┬───────────────────────────────────────┘
                       │
                       ▼
@@ -155,42 +247,50 @@ Then ask:
                       ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                    Elasticsearch                            │
-│         All deployment events logged & searchable           │
-│              (workflows/elasticsearch/)                     │
+│         Index: distributed-tool-results                     │
+│         Stores: URLs, timing, status for each VM            │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ### Project Structure
 
 ```
-├── agent/                      # Agent system
-│   ├── main.py                 # Main agent entry point
-│   └── system-prompt.md        # Agent instructions
+├── runner/                     # Distributed deployment runner
+│   └── distributed_runner.py   # Polls ES, executes deployments in parallel
 │
-├── runner/                     # Deployment runner
-│   └── distributed_runner.py   # Parallel VM deployment
-│
-├── workflows/                  # Elasticsearch workflows
-│   ├── deploy-to-fleet.yaml    # Main deployment workflow
-│   ├── list-available-vms.yaml # VM query workflow
-│   └── check-deployment-status.yaml # Status monitoring
+├── workflows/                  # Elasticsearch workflow definitions
+│   ├── deploy-to-fleet.yaml    # Main deployment workflow (creates ES request)
+│   ├── check-deployment-status.yaml # Query deployment status
+│   └── list-available-vms.yaml # List available Blaxel VMs
 │
 ├── src/                        # Core libraries
-│   ├── blaxel/                 # Blaxel SDK integration
+│   ├── blaxel/                 # Blaxel SDK integration (if needed)
 │   └── config/                 # Configuration management
 │
 ├── tests/                      # Test suite
-│   ├── test_elasticsearch.py   # Elasticsearch integration tests
-│   └── test_runner_connections.py # Runner connectivity tests
+│   ├── test_elasticsearch.py   # Elasticsearch connection test
+│   ├── test_runner_connections.py # Runner connectivity test
+│   └── test_official_pattern.py # Full deployment test
 │
 ├── utils/                      # Utility scripts
-│   ├── verify_connections.py   # API connection verification
-│   └── get_full_urls.py        # URL retrieval helper
+│   ├── verify_connections.py   # Verify ES + Blaxel connections
+│   └── get_full_urls.py        # Retrieve preview URLs
 │
-├── config.yaml                 # VM templates & RBAC
-├── .env                        # API credentials
+├── config.yaml                 # Blaxel VM templates & RBAC
+├── .env                        # API credentials (not committed)
 └── README.md                   # This file
 ```
+
+### Elasticsearch Indices
+
+The system uses these Elasticsearch indices:
+
+| Index | Purpose | Created By |
+|-------|---------|------------|
+| `distributed-tool-requests` | Deployment requests (pending/processing/completed) | Workflow |
+| `distributed-tool-results` | Deployment results with URLs and timing | Runner |
+| `deployment-logs` | Event logs for each deployment step | Workflow & Runner |
+| `sandbox-latency` | VM latency measurements | Runner (optional) |
 
 ---
 
