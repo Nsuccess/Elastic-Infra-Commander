@@ -127,10 +127,12 @@ Then ask:
                       ▼
 ┌─────────────────────────────────────────────────────────────┐
 │              Elastic Infra Commander Agent                  │
+│                   (agent/main.py)                           │
 │                                                             │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
 │  │  Deployment  │  │ Elasticsearch│  │   Blaxel     │     │
 │  │   Runner     │  │   Logger     │  │   SDK        │     │
+│  │ (runner/)    │  │ (workflows/) │  │ (src/blaxel/)│     │
 │  └──────────────┘  └──────────────┘  └──────────────┘     │
 └─────────────────────┬───────────────────────────────────────┘
                       │
@@ -154,7 +156,40 @@ Then ask:
 ┌─────────────────────────────────────────────────────────────┐
 │                    Elasticsearch                            │
 │         All deployment events logged & searchable           │
+│              (workflows/elasticsearch/)                     │
 └─────────────────────────────────────────────────────────────┘
+```
+
+### Project Structure
+
+```
+├── agent/                      # Agent system
+│   ├── main.py                 # Main agent entry point
+│   └── system-prompt.md        # Agent instructions
+│
+├── runner/                     # Deployment runner
+│   └── distributed_runner.py   # Parallel VM deployment
+│
+├── workflows/                  # Elasticsearch workflows
+│   ├── deploy-to-fleet.yaml    # Main deployment workflow
+│   ├── list-available-vms.yaml # VM query workflow
+│   └── check-deployment-status.yaml # Status monitoring
+│
+├── src/                        # Core libraries
+│   ├── blaxel/                 # Blaxel SDK integration
+│   └── config/                 # Configuration management
+│
+├── tests/                      # Test suite
+│   ├── test_elasticsearch.py   # Elasticsearch integration tests
+│   └── test_runner_connections.py # Runner connectivity tests
+│
+├── utils/                      # Utility scripts
+│   ├── verify_connections.py   # API connection verification
+│   └── get_full_urls.py        # URL retrieval helper
+│
+├── config.yaml                 # VM templates & RBAC
+├── .env                        # API credentials
+└── README.md                   # This file
 ```
 
 ---
