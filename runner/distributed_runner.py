@@ -131,7 +131,7 @@ async def process_deployment_request(request):
     source = request['_source']
     
     repo_url = source.get('repo_url')
-    num_vms = source.get('num_vms', 2)
+    num_vms = int(source.get('num_vms', 2))  # Convert to int
     
     print(f"\n{'='*70}")
     print(f"📦 Processing Deployment Request: {request_id}")
