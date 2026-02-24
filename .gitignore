@@ -1,3 +1,4 @@
+# Python
 __pycache__
 .pytest_cache
 .venv
@@ -5,12 +6,18 @@ __pycache__
 .env
 *.pyc
 *.pyo
+
+# OS
 .DS_Store
 Thumbs.db
 *.log
+
+# IDE
 .idea/
 .vscode/
 .kiro/
+
+# Build
 *.egg-info/
 dist/
 build/

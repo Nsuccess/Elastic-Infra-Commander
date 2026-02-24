@@ -3,7 +3,6 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-
 print("=" * 80)
 print("VERIFYING API CONNECTIONS")
 print("=" * 80)

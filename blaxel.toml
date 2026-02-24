@@ -1,5 +1,5 @@
 [metadata]
-name = "fleet-sandbox"
+name = "elastic-infra-sandbox"
 type = "sandbox"
 
 [spec]

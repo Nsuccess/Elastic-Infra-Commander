@@ -1,9 +1,8 @@
-"""Check how long the deployed game links will last"""
+"""Check how long the deployed game links will last."""
 import asyncio
 import os
 from datetime import datetime, timezone
 from dotenv import load_dotenv
-
 load_dotenv()
 os.environ['BL_WORKSPACE'] = os.getenv('BL_WORKSPACE', '')
 os.environ['BL_API_KEY'] = os.getenv('BL_API_KEY', '')

@@ -8,7 +8,7 @@ templates:
     image: "blaxel/prod-node:latest"
     memory: 4096
     ports:
-      - name: "game"
+      - name: "app"
         target: 8080
         public: true
     envs:
@@ -19,19 +19,19 @@ templates:
     image: "blaxel/prod-node:latest"
     memory: 2048
     ports:
-      - name: "game"
+      - name: "app"
         target: 8080
         public: true
 
 rbac:
   groups:
-    hackers:
+    developers:
       allowed_templates: ["dev-fast", "prod-node"]
       max_sandboxes: 10
-    gods:
+    admins:
       allowed_templates: ["*"]
       max_sandboxes: 50
   
   users:
-    - api_key: "gsk_hack_winner_2025"
-      groups: ["gods"]
+    - api_key: "gsk_elastic_infra_2026"
+      groups: ["admins"]
