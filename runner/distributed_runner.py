@@ -208,8 +208,7 @@ async def poll_elasticsearch():
                     "query": {
                         "term": {"status": "pending"}
                     },
-                    "size": 1,
-                    "sort": [{"created_at": "asc"}]
+                    "size": 1
                 }
             )
             
